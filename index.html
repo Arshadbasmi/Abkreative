@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Monitor — Live</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <span class="logo">ABK<span class="accent">REATIVE</span></span>
+      <span class="header-divider">|</span>
+      <span class="header-title">WORLD MONITOR</span>
+    </div>
+    <div class="header-right">
+      <span class="live-badge"><span class="pulse-dot"></span>LIVE</span>
+      <span id="utc-clock" class="utc-clock">UTC 00:00:00</span>
+    </div>
+  </header>
+
+  <main class="grid">
+
+    <!-- Globe -->
+    <section class="card card--globe" id="globe-card">
+      <div class="card-label">EARTH — REAL TIME</div>
+      <canvas id="globe" width="480" height="480"></canvas>
+      <div class="globe-overlay">
+        <div class="geo-line"></div>
+        <div class="geo-line geo-line--2"></div>
+      </div>
+    </section>
+
+    <!-- World Clocks -->
+    <section class="card card--clocks">
+      <div class="card-label">WORLD CLOCKS</div>
+      <div class="clocks-grid" id="clocks-grid"></div>
+    </section>
+
+    <!-- Global Stats -->
+    <section class="card card--stats">
+      <div class="card-label">GLOBAL PULSE</div>
+      <div class="stats-list" id="stats-list"></div>
+    </section>
+
+    <!-- Internet Activity -->
+    <section class="card card--internet">
+      <div class="card-label">INTERNET ACTIVITY — LAST 60s</div>
+      <canvas id="activity-chart" width="600" height="140"></canvas>
+      <div class="activity-legend" id="activity-legend"></div>
+    </section>
+
+    <!-- Seismic Events -->
+    <section class="card card--seismic">
+      <div class="card-label">SEISMIC MONITOR</div>
+      <div class="seismic-feed" id="seismic-feed"></div>
+    </section>
+
+    <!-- News Ticker -->
+    <section class="card card--ticker">
+      <div class="ticker-inner">
+        <span class="ticker-tag">FEEDS</span>
+        <div class="ticker-track" id="ticker-track"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
