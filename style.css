@@ -1,4 +1,4 @@
-/* ─── Reset & Base ─────────────────────────────────────────────── */
+/* ─── Reset & Base ─────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -81,7 +81,7 @@ body::before {
 
 .utc-clock { font-size: 12px; letter-spacing: 2px; color: var(--accent); font-variant-numeric: tabular-nums; }
 
-/* ─── Grid ───────────────────────────────────────────────────────── */
+/* ─── Grid ─────────────────────────────────────────────────────── */
 .grid {
   display: grid;
   grid-template-columns: 500px 1fr 1fr 260px;
@@ -213,19 +213,20 @@ body::before {
 .market-sparkline { width: 100%; height: 28px; display: block; }
 .market-sparkline line, .market-sparkline polyline { vector-effect: non-scaling-stroke; }
 
-/* ─── Internet Activity ──────────────────────────────────── */
-.card--internet {
-  grid-column: 3; grid-row: 2;
-  display: flex; flex-direction: column; gap: 10px;
-}
+/* ─── Internet Activity ────────────────────────────────────────── */
 #activity-chart { width: 100%; height: 130px; }
 
 .activity-legend { display: flex; gap: 20px; flex-wrap: wrap; }
 .legend-item { display: flex; align-items: center; gap: 6px; font-size: 9px; letter-spacing: 1px; color: var(--text-dim); }
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-/* ─── Seismic ─────────────────────────────────────────────────── */
+/* ─── Seismic ──────────────────────────────────────────────────── */
 .card--seismic { grid-column: 2; grid-row: 2; }
+
+.card--internet {
+  grid-column: 3; grid-row: 2;
+  display: flex; flex-direction: column; gap: 10px;
+}
 
 .seismic-feed { display: flex; flex-direction: column; gap: 5px; overflow: hidden; max-height: 280px; }
 
