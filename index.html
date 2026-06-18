@@ -13,6 +13,12 @@
       <span class="header-divider">|</span>
       <span class="header-title">WORLD MONITOR</span>
     </div>
+    <div class="header-center" id="status-bar">
+      <span class="status-item"><span class="status-dot"></span><span id="s-flights">8,241</span> FLIGHTS</span>
+      <span class="status-item"><span class="status-dot status-dot--green"></span><span id="s-satellites">8,377</span> SATELLITES</span>
+      <span class="status-item"><span class="status-dot status-dot--yellow"></span><span id="s-quakes">0</span> QUAKES TODAY</span>
+      <span class="status-item"><span class="status-dot status-dot--red"></span><span id="s-alerts">3</span> ALERTS</span>
+    </div>
     <div class="header-right">
       <span class="live-badge"><span class="pulse-dot"></span>LIVE</span>
       <span id="utc-clock" class="utc-clock">UTC 00:00:00</span>
@@ -22,8 +28,8 @@
   <main class="grid">
 
     <!-- Globe -->
-    <section class="card card--globe" id="globe-card">
-      <div class="card-label">EARTH — REAL TIME</div>
+    <section class="card card--globe">
+      <div class="card-label">EARTH — REAL TIME <span class="label-note" id="sun-pos"></span></div>
       <canvas id="globe" width="480" height="480"></canvas>
       <div class="globe-overlay">
         <div class="geo-line"></div>
@@ -43,6 +49,12 @@
       <div class="stats-list" id="stats-list"></div>
     </section>
 
+    <!-- Markets -->
+    <section class="card card--markets">
+      <div class="card-label">MARKETS <span class="label-note">SIMULATED</span></div>
+      <div class="markets-list" id="markets-list"></div>
+    </section>
+
     <!-- Internet Activity -->
     <section class="card card--internet">
       <div class="card-label">INTERNET ACTIVITY — LAST 60s</div>
@@ -52,7 +64,7 @@
 
     <!-- Seismic Events -->
     <section class="card card--seismic">
-      <div class="card-label">SEISMIC MONITOR</div>
+      <div class="card-label">SEISMIC MONITOR <span class="label-note" id="seismic-src"></span></div>
       <div class="seismic-feed" id="seismic-feed"></div>
     </section>
 
