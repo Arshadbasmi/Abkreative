@@ -5,19 +5,19 @@ const starsCv = document.getElementById('stars-bg');
 starsCv.width = window.innerWidth;
 starsCv.height = window.innerHeight;
 const sctx = starsCv.getContext('2d');
-const STARS = Array.from({ length: 220 }, () => ({
+const STARS = Array.from({ length: 260 }, () => ({
   x: Math.random(), y: Math.random(),
-  r: Math.random() * 1.1 + 0.25,
-  base: Math.random() * 0.55 + 0.15,
+  r: Math.random() * 1.2 + 0.2,
+  base: Math.random() * 0.5 + 0.12,
   phase: Math.random() * Math.PI * 2,
 }));
 function drawStars(ts) {
   sctx.clearRect(0, 0, starsCv.width, starsCv.height);
   STARS.forEach(s => {
-    const a = s.base + 0.18 * Math.sin(ts * 0.0007 + s.phase);
+    const a = s.base + 0.15 * Math.sin(ts * 0.0007 + s.phase);
     sctx.beginPath();
     sctx.arc(s.x * starsCv.width, s.y * starsCv.height, s.r, 0, Math.PI * 2);
-    sctx.fillStyle = `rgba(180,220,255,${a.toFixed(2)})`;
+    sctx.fillStyle = `rgba(200,220,255,${a.toFixed(2)})`;
     sctx.fill();
   });
   requestAnimationFrame(drawStars);
@@ -28,6 +28,7 @@ window.addEventListener('resize', () => {
   starsCv.height = window.innerHeight;
 });
 
+
 // ── Nav Tabs ──────────────────────────────────────────────────
 document.querySelectorAll('.nav-tab').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -35,6 +36,13 @@ document.querySelectorAll('.nav-tab').forEach(btn => {
     btn.classList.add('active');
   });
 });
+document.querySelectorAll('.mnav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mnav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
 
 // ── UTC Clock ──────────────────────────────────────────────────
 const utcEl = document.getElementById('utc-clock');
@@ -60,32 +68,21 @@ function updateStatus() {
     s.el.textContent = val;
   });
   document.getElementById('s-quakes').textContent = quakesToday;
-  // Update left-panel status cards
-  const scF = document.getElementById('sc-flights');
-  const scS = document.getElementById('sc-satellites');
-  const scQ = document.getElementById('sc-quakes');
-  const scA = document.getElementById('sc-alerts');
-  if (scF) scF.textContent = STATUS.flights.el.textContent;
-  if (scS) scS.textContent = STATUS.satellites.el.textContent;
-  if (scQ) scQ.textContent = quakesToday;
-  if (scA) scA.textContent = STATUS.alerts.el.textContent;
 }
 setInterval(updateStatus, 5000);
 updateStatus();
 
 
-// ── World Clocks ───────────────────────────────────────────────
+// ── World Clocks — detailed 2-line format ──────────────────────
 const CITIES = [
-  { name: 'NEW YORK',    tz: 'America/New_York',   offset: -5,   lat: 40.71,  lon: -74.00 },
-  { name: 'LONDON',      tz: 'Europe/London',       offset:  0,   lat: 51.51,  lon: -0.13  },
-  { name: 'PARIS',       tz: 'Europe/Paris',        offset:  1,   lat: 48.85,  lon:  2.35  },
-  { name: 'DUBAI',       tz: 'Asia/Dubai',          offset:  4,   lat: 25.20,  lon: 55.27  },
-  { name: 'MUMBAI',      tz: 'Asia/Kolkata',        offset:  5.5, lat: 19.08,  lon: 72.88  },
-  { name: 'SINGAPORE',   tz: 'Asia/Singapore',      offset:  8,   lat:  1.35,  lon: 103.82 },
-  { name: 'TOKYO',       tz: 'Asia/Tokyo',          offset:  9,   lat: 35.68,  lon: 139.69 },
-  { name: 'SYDNEY',      tz: 'Australia/Sydney',    offset: 10,   lat: -33.87, lon: 151.21 },
-  { name: 'LOS ANGELES', tz: 'America/Los_Angeles', offset: -8,   lat: 34.05,  lon: -118.24},
-  { name: 'SAO PAULO',   tz: 'America/Sao_Paulo',   offset: -3,   lat: -23.55, lon: -46.63 },
+  { name: 'LONDON',      tz: 'Europe/London',       lat: 51.51,  lon: -0.13   },
+  { name: 'NEW YORK',    tz: 'America/New_York',     lat: 40.71,  lon: -74.00  },
+  { name: 'TOKYO',       tz: 'Asia/Tokyo',           lat: 35.68,  lon: 139.69  },
+  { name: 'SINGAPORE',   tz: 'Asia/Singapore',       lat:  1.35,  lon: 103.82  },
+  { name: 'DUBAI',       tz: 'Asia/Dubai',           lat: 25.20,  lon: 55.27   },
+  { name: 'PARIS',       tz: 'Europe/Paris',         lat: 48.85,  lon:  2.35   },
+  { name: 'SYDNEY',      tz: 'Australia/Sydney',     lat: -33.87, lon: 151.21  },
+  { name: 'LOS ANGELES', tz: 'America/Los_Angeles',  lat: 34.05,  lon: -118.24 },
 ];
 
 const WX_CODE = {
@@ -101,13 +98,20 @@ const WX_CODE = {
 const clocksGrid = document.getElementById('clocks-grid');
 CITIES.forEach(city => {
   const key = city.name.replace(/ /g, '_');
-  const abbr = city.name.split(' ')[0].slice(0, 7);
+  const shortTz = city.tz.split('/').pop().replace(/_/g, ' ');
   const el = document.createElement('div');
-  el.className = 'clock-row';
+  el.className = 'clock-item';
   el.innerHTML = `
-    <span class="clock-city">${abbr}</span>
-    <span class="clock-time" id="ct-${key}">--:--</span>
-    <span class="clock-wx" id="cw-${key}"></span>
+    <div class="clock-main">
+      <span class="clock-city-name">${city.name}</span>
+      <span class="clock-hms" id="ct-${key}">--:--:--</span>
+      <span class="clock-wx-icon" id="cwi-${key}"></span>
+    </div>
+    <div class="clock-sub">
+      <span class="clock-tz">${shortTz}</span>
+      <span class="clock-12h" id="ct12-${key}"></span>
+      <span class="clock-temp" id="cw-${key}"></span>
+    </div>
   `;
   clocksGrid.appendChild(el);
 });
@@ -117,9 +121,10 @@ function updateClocks() {
   CITIES.forEach(city => {
     try {
       const key = city.name.replace(/ /g, '_');
-      const el = document.getElementById(`ct-${key}`);
-      if (el) el.textContent =
-        now.toLocaleTimeString('en-GB', { timeZone: city.tz, hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const el24 = document.getElementById(`ct-${key}`);
+      if (el24) el24.textContent = now.toLocaleTimeString('en-GB', { timeZone: city.tz, hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const el12 = document.getElementById(`ct12-${key}`);
+      if (el12) el12.textContent = now.toLocaleTimeString('en-US', { timeZone: city.tz, hour12: true, hour: 'numeric', minute: '2-digit' }).toLowerCase();
     } catch(e) {}
   });
 }
@@ -133,11 +138,14 @@ async function fetchWeather() {
         `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,weather_code`
       );
       const d = await r.json();
-      const temp = Math.round(d.current.temperature_2m);
+      const tempC = Math.round(d.current.temperature_2m);
+      const tempF = Math.round(tempC * 9 / 5 + 32);
       const icon = WX_CODE[d.current.weather_code] ?? '🌡️';
       const key = city.name.replace(/ /g, '_');
-      const el = document.getElementById(`cw-${key}`);
-      if (el) el.textContent = `${icon} ${temp}°C`;
+      const iconEl = document.getElementById(`cwi-${key}`);
+      if (iconEl) iconEl.textContent = icon;
+      const tempEl = document.getElementById(`cw-${key}`);
+      if (tempEl) tempEl.textContent = `${tempC}° / ${tempF}°F`;
     } catch(e) {}
     await new Promise(res => setTimeout(res, 200));
   }
@@ -146,67 +154,61 @@ fetchWeather();
 setInterval(fetchWeather, 600_000);
 
 
-// ── Global Stats ───────────────────────────────────────────────
+// ── Global Pulse — icon grid ───────────────────────────────────
 const STATS = [
-  { id: 'population', label: 'WORLD POPULATION', icon: '🌍', color: '',       base: 8_200_000_000, rate: 2.6,            fmt: v => formatBig(v) },
-  { id: 'internet',   label: 'INTERNET USERS',   icon: '🌐', color: '',       base: 5_500_000_000, rate: 1.7,            fmt: v => formatBig(v) },
-  { id: 'emails',     label: 'EMAILS SENT TODAY', icon: '✉️', color: 'green', base: 0, rate: 3_500_000/60,  fmt: v => formatBig(v), daily: true },
-  { id: 'posts',      label: 'SOCIAL POSTS TODAY',icon: '📡', color: 'green', base: 0, rate: 12_000/60,     fmt: v => formatBig(v), daily: true },
-  { id: 'co2',        label: 'CO₂ TODAY (kt)',    icon: '🏭', color: 'red',   base: 0, rate: 1_200/3600,    fmt: v => Math.floor(v).toLocaleString(), daily: true },
-  { id: 'energy',     label: 'ENERGY TODAY (GWh)',icon: '⚡', color: 'yellow',base: 0, rate: 29_000/86400,  fmt: v => v.toFixed(1), daily: true },
+  { id: 'population', label: 'POPULATION',  icon: '👥', base: 8_200_000_000, rate: 2.6,           fmt: v => formatBig(v), daily: false },
+  { id: 'internet',   label: 'NET USERS',   icon: '🌐', base: 5_500_000_000, rate: 1.7,           fmt: v => formatBig(v), daily: false },
+  { id: 'emails',     label: 'EMAILS',      icon: '✉️', base: 0, rate: 3_500_000/60,             fmt: v => formatBig(v), daily: true  },
+  { id: 'co2',        label: 'CO₂ kt',      icon: '🏭', base: 0, rate: 1_200/3600,               fmt: v => formatBig(v), daily: true  },
+  { id: 'energy',     label: 'ENERGY GWh',  icon: '⚡', base: 0, rate: 29_000/86400,             fmt: v => v.toFixed(1), daily: true  },
+  { id: 'alerts',     label: 'ALERTS',      icon: '⚠️', base: 3, rate: 0,                        fmt: v => Math.round(v).toString(), daily: false },
 ];
 
 const secToday = () => { const n = new Date(); return n.getHours()*3600 + n.getMinutes()*60 + n.getSeconds(); };
-const statEl = document.getElementById('stats-list');
+const statGrid = document.getElementById('stats-grid');
 const statState = {};
-const barMax = {};
 
 STATS.forEach(s => {
-  const div = document.createElement('div');
-  div.className = `stat-item${s.color ? ' ' + s.color : ''}`;
-  div.innerHTML = `
-    <span class="stat-icon">${s.icon}</span>
-    <div class="stat-info">
-      <div class="stat-label">${s.label}</div>
-      <div><span class="stat-value" id="sv-${s.id}">—</span><span class="stat-delta" id="sd-${s.id}"></span></div>
-      <div class="stat-bar-wrap"><div class="stat-bar" id="sb-${s.id}" style="width:0%"></div></div>
-    </div>`;
-  statEl.appendChild(div);
+  const card = document.createElement('div');
+  card.className = 'stat-icon-card';
+  card.innerHTML = `
+    <span class="sic-icon">${s.icon}</span>
+    <div class="sic-val" id="sv-${s.id}">—</div>
+    <div class="sic-label">${s.label}</div>
+  `;
+  statGrid.appendChild(card);
   statState[s.id] = { val: s.daily ? s.rate * secToday() : s.base };
 });
 
 function updateStats() {
   STATS.forEach(s => {
     const st = statState[s.id];
-    const prev = st.val;
     st.val += s.rate + (Math.random() - 0.48) * s.rate * 0.3;
     if (st.val < 0) st.val = 0;
-    const delta = st.val - prev;
-    document.getElementById(`sd-${s.id}`).textContent = `+${s.fmt(delta)}/s`;
-    document.getElementById(`sv-${s.id}`).textContent = s.fmt(st.val);
-    if (!barMax[s.id]) barMax[s.id] = st.val * 2;
-    document.getElementById(`sb-${s.id}`).style.width = Math.min(100, st.val / barMax[s.id] * 100) + '%';
+    const el = document.getElementById(`sv-${s.id}`);
+    if (el) el.textContent = s.fmt(st.val);
   });
+  statState['alerts'].val = 3 + Math.floor(quakesToday * 0.1);
 }
 setInterval(updateStats, 1000);
 updateStats();
 
 function formatBig(n) {
-  if (n >= 1e9) return (n/1e9).toFixed(3) + 'B';
-  if (n >= 1e6) return (n/1e6).toFixed(2) + 'M';
+  if (n >= 1e9) return (n/1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
   if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
   return Math.floor(n).toString();
 }
 
 
-// ── Markets ────────────────────────────────────────────────────
+// ── Markets — with 24h + 7d columns ───────────────────────────
 const MARKETS = [
-  { id: 'btc',  label: 'BTC / USD', price: 67_450,  fmt: p => '$' + Math.round(p).toLocaleString(), vol: 350 },
-  { id: 'eth',  label: 'ETH / USD', price: 3_855,   fmt: p => '$' + Math.round(p).toLocaleString(), vol: 45  },
-  { id: 'sp',   label: 'S&P 500',   price: 5_280,   fmt: p => Math.round(p).toLocaleString(),        vol: 12  },
-  { id: 'gold', label: 'XAU / USD', price: 2_328,   fmt: p => '$' + p.toFixed(1),                   vol: 5   },
-  { id: 'oil',  label: 'WTI OIL',   price: 82.4,   fmt: p => '$' + p.toFixed(2),                   vol: 0.4 },
-  { id: 'eur',  label: 'EUR / USD', price: 1.0882, fmt: p => p.toFixed(4),                          vol: 0.0008 },
+  { id: 'btc',  label: 'BTC/USD', price: 67_450,  vol: 350,    fmt: p => '$' + Math.round(p).toLocaleString() },
+  { id: 'eth',  label: 'ETH/USD', price: 3_855,   vol: 45,     fmt: p => '$' + Math.round(p).toLocaleString() },
+  { id: 'sp',   label: 'S&P 500', price: 5_280,   vol: 12,     fmt: p => Math.round(p).toLocaleString()       },
+  { id: 'gold', label: 'GOLD',    price: 2_328,   vol: 5,      fmt: p => '$' + p.toFixed(1)                  },
+  { id: 'oil',  label: 'WTI OIL', price: 82.4,   vol: 0.4,    fmt: p => '$' + p.toFixed(2)                  },
+  { id: 'eur',  label: 'EUR/USD', price: 1.0882,  vol: 0.0008, fmt: p => p.toFixed(4)                        },
 ];
 
 const SPARK_PTS = 40;
@@ -214,22 +216,26 @@ const mktState = {};
 const mktList = document.getElementById('markets-list');
 
 MARKETS.forEach(m => {
+  const weekDrift = (Math.random() - 0.5) * m.vol * 80;
   mktState[m.id] = {
     price: m.price,
     open: m.price,
+    weekOpen: m.price - weekDrift,
     history: Array.from({ length: SPARK_PTS }, () => m.price + (Math.random() - 0.5) * m.vol * 10),
   };
-
   const div = document.createElement('div');
   div.className = 'market-item';
   div.id = `mi-${m.id}`;
   div.innerHTML = `
-    <div class="market-top">
+    <div class="market-row">
       <span class="market-label">${m.label}</span>
-      <span class="market-change" id="mc-${m.id}">+0.00%</span>
+      <svg class="market-sparkline" id="ms-${m.id}" viewBox="0 0 60 20" preserveAspectRatio="none"></svg>
+      <div class="market-pcts">
+        <span class="market-pct" id="md-${m.id}">+0.00%</span>
+        <span class="market-pct dim" id="mw-${m.id}">+0.00%</span>
+      </div>
     </div>
     <div class="market-price" id="mp-${m.id}"></div>
-    <svg class="market-sparkline" id="ms-${m.id}" viewBox="0 0 100 22" preserveAspectRatio="none"></svg>
   `;
   mktList.appendChild(div);
 });
@@ -237,63 +243,61 @@ MARKETS.forEach(m => {
 function renderSparkline(id, history, color) {
   const svg = document.getElementById(`ms-${id}`);
   if (!svg) return;
-  const H = 22;
+  const W = 60, H = 20;
   const min = Math.min(...history), max = Math.max(...history);
   const range = max - min || 1;
   const pts = history.map((v, i) => {
-    const x = (i / (history.length - 1)) * 100;
+    const x = (i / (history.length - 1)) * W;
     const y = H - ((v - min) / range) * (H - 2) - 1;
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   }).join(' ');
-  const lastY = (H - ((history[history.length - 1] - min) / range) * (H - 2) - 1).toFixed(1);
-
+  const lastY = (H - ((history[history.length-1] - min) / range) * (H - 2) - 1).toFixed(1);
   svg.innerHTML = `
-    <defs>
-      <linearGradient id="sg-${id}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="${color}" stop-opacity="0.28"/>
-        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,${H} ${pts} 100,${H}" fill="url(#sg-${id})"/>
+    <defs><linearGradient id="sg-${id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${color}" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+    </linearGradient></defs>
+    <polygon points="0,${H} ${pts} ${W},${H}" fill="url(#sg-${id})"/>
     <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5"/>
-    <circle cx="100" cy="${lastY}" r="2" fill="${color}"/>
+    <circle cx="${W}" cy="${lastY}" r="2" fill="${color}"/>
   `;
 }
 
 function updateMarkets() {
   MARKETS.forEach(m => {
     const st = mktState[m.id];
-    const drift = (Math.random() - 0.495) * m.vol;
-    st.price = Math.max(st.price * 0.95, st.price + drift);
+    st.price = Math.max(st.price * 0.95, st.price + (Math.random() - 0.495) * m.vol);
     st.history.push(st.price);
     if (st.history.length > SPARK_PTS) st.history.shift();
 
-    const pct = ((st.price - st.open) / st.open) * 100;
-    const up = pct >= 0;
+    const pct24 = ((st.price - st.open) / st.open) * 100;
+    const pct7d  = ((st.price - st.weekOpen) / st.weekOpen) * 100;
+    const up = pct24 >= 0;
     const color = up ? '#00ff9d' : '#ff3e6c';
 
     document.getElementById(`mp-${m.id}`).textContent = m.fmt(st.price);
 
-    const chEl = document.getElementById(`mc-${m.id}`);
-    chEl.textContent = (up ? '+' : '') + pct.toFixed(2) + '%';
-    chEl.className = 'market-change' + (up ? '' : ' neg');
+    const d24 = document.getElementById(`md-${m.id}`);
+    d24.textContent = (pct24 >= 0 ? '+' : '') + pct24.toFixed(2) + '%';
+    d24.className = 'market-pct' + (up ? '' : ' neg');
 
-    const item = document.getElementById(`mi-${m.id}`);
-    item.className = 'market-item ' + (up ? 'up' : 'down');
+    const d7 = document.getElementById(`mw-${m.id}`);
+    d7.textContent = (pct7d >= 0 ? '+' : '') + pct7d.toFixed(2) + '%';
+    d7.className = 'market-pct dim' + (pct7d >= 0 ? '' : ' neg');
 
+    document.getElementById(`mi-${m.id}`).className = 'market-item ' + (up ? 'up' : 'down');
     renderSparkline(m.id, st.history, color);
   });
 }
-
 setInterval(updateMarkets, 1500);
 updateMarkets();
 
 
 // ── Internet Activity Chart ────────────────────────────────────
 const SERIES = [
-  { label: 'TRAFFIC (Tbps)',  color: '#00d4ff', base: 820, amp: 80  },
-  { label: 'ATTACKS/min',     color: '#ff3e6c', base: 340, amp: 120 },
-  { label: 'NEW SITES/min',   color: '#00ff9d', base: 12,  amp: 6   },
+  { label: 'TRAFFIC (Tbps)',  color: '#ffc300', base: 820,  amp: 80  },
+  { label: 'ATTACKS/min',     color: '#ff3e6c', base: 340,  amp: 120 },
+  { label: 'NEW SITES/min',   color: '#00d4ff', base: 12,   amp: 6   },
 ];
 const CHART_PTS = 60;
 const seriesData = SERIES.map(s =>
@@ -311,12 +315,13 @@ function pushChart() {
 }
 
 function drawChart() {
-  const W = chartCanvas.offsetWidth * devicePixelRatio;
-  const H = 100 * devicePixelRatio;
+  const dpr = devicePixelRatio;
+  const W = (chartCanvas.offsetWidth || 400) * dpr;
+  const H = (chartCanvas.offsetHeight || 100) * dpr;
+  if (H < 10) return;
   chartCanvas.width = W; chartCanvas.height = H;
   ctx.clearRect(0, 0, W, H);
 
-  // Grid
   ctx.strokeStyle = '#0e3a5c44'; ctx.lineWidth = 1;
   for (let i = 0; i <= 4; i++) {
     const y = (H / 4) * i;
@@ -332,29 +337,25 @@ function drawChart() {
       y: H - ((v - min) / range) * H * 0.82 - H * 0.06,
     }));
 
-    // Fill
     ctx.beginPath();
     ctx.moveTo(pts[0].x, H);
     pts.forEach(p => ctx.lineTo(p.x, p.y));
     ctx.lineTo(pts[pts.length - 1].x, H);
     ctx.closePath();
     const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, s.color + '33'); grad.addColorStop(1, s.color + '00');
+    grad.addColorStop(0, s.color + '40'); grad.addColorStop(1, s.color + '00');
     ctx.fillStyle = grad; ctx.fill();
 
-    // Line
     ctx.beginPath();
     pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
-    ctx.strokeStyle = s.color; ctx.lineWidth = 1.5 * devicePixelRatio; ctx.stroke();
+    ctx.strokeStyle = s.color; ctx.lineWidth = 1.5 * dpr; ctx.stroke();
 
-    // Dot
     const lp = pts[pts.length - 1];
-    ctx.beginPath(); ctx.arc(lp.x, lp.y, 3 * devicePixelRatio, 0, Math.PI * 2);
+    ctx.beginPath(); ctx.arc(lp.x, lp.y, 3 * dpr, 0, Math.PI * 2);
     ctx.fillStyle = s.color; ctx.fill();
 
-    // Current value label
-    ctx.fillStyle = s.color; ctx.font = `${9 * devicePixelRatio}px Courier New`;
-    ctx.fillText(data[data.length-1].toFixed(si === 2 ? 1 : 0), lp.x + 6 * devicePixelRatio, lp.y + 4 * devicePixelRatio);
+    ctx.fillStyle = s.color; ctx.font = `${8 * dpr}px Courier New`;
+    ctx.fillText(data[data.length-1].toFixed(si === 2 ? 1 : 0), lp.x + 5 * dpr, lp.y + 4 * dpr);
   });
 }
 
@@ -378,8 +379,6 @@ const LOCS = [
   'Peru','Tonga','Taiwan','Papua New Guinea','Nepal','Pakistan','Vanuatu',
   'Solomon Islands','Fiji','Colombia','Argentina','Myanmar','Iceland',
 ];
-
-// Approx coords per location for globe pings
 const LOC_COORDS = {
   'Honshu, Japan': [36, 138], 'California, USA': [36, -119], 'Sumatra, Indonesia': [0, 102],
   'Chile': [-30, -71], 'Turkey': [39, 35], 'Philippines': [12, 122],
@@ -398,25 +397,18 @@ function magLevel(m) {
   return 'minor';
 }
 
-let seismicSrc = 'SIM';
-
 function addSeismicItem(ev) {
   const feed = document.getElementById('seismic-feed');
   const el = document.createElement('div');
-  el.className = 'seismic-item';
+  el.className = 'seismic-row';
   el.dataset.level = ev.level;
   el.innerHTML = `
-    <span class="seismic-mag">M${ev.mag}</span>
-    <div class="seismic-info">
-      <div class="seismic-place">${ev.place}</div>
-      <div class="seismic-meta">UTC ${ev.time} · ${ev.level.toUpperCase()}${ev.src ? ' · ' + ev.src : ''}</div>
-    </div>
-    <span class="seismic-depth">${ev.depth}km</span>
+    <span class="sr-loc">${ev.place}</span>
+    <span class="sr-mag">${ev.mag}</span>
+    <span class="sr-time">${ev.time}</span>
   `;
   feed.insertBefore(el, feed.firstChild);
-  while (feed.children.length > 7) feed.removeChild(feed.lastChild);
-
-  // Add ping on globe
+  while (feed.children.length > 9) feed.removeChild(feed.lastChild);
   const coords = LOC_COORDS[ev.place];
   if (coords) addPing(coords[0], coords[1], ev.level);
 }
@@ -424,15 +416,14 @@ function addSeismicItem(ev) {
 function genFakeSeismic() {
   const loc = LOCS[Math.floor(Math.random() * LOCS.length)];
   const mag = (Math.random() * 6.2 + 1.5).toFixed(1);
-  const level = magLevel(parseFloat(mag));
   return {
-    mag, level, place: loc,
-    depth: Math.floor(Math.random() * 200 + 5),
-    time: new Date().toUTCString().slice(17, 25),
+    mag, place: loc,
+    level: magLevel(parseFloat(mag)),
+    time: new Date().toISOString().slice(0, 16).replace('T', ' '),
   };
 }
 
-for (let i = 0; i < 5; i++) addSeismicItem(genFakeSeismic());
+for (let i = 0; i < 6; i++) addSeismicItem(genFakeSeismic());
 
 function scheduleSeismic() {
   setTimeout(() => { addSeismicItem(genFakeSeismic()); quakesToday++; scheduleSeismic(); },
@@ -447,20 +438,18 @@ async function loadUSGS() {
     const feed = document.getElementById('seismic-feed');
     feed.innerHTML = '';
     quakesToday = data.features.length;
-    data.features.slice(0, 7).reverse().forEach(f => {
+    data.features.slice(0, 9).reverse().forEach(f => {
       const mag = f.properties.mag?.toFixed(1) ?? '?';
-      const level = magLevel(parseFloat(mag));
       const coords = f.geometry.coordinates;
-      addPing(coords[1], coords[0], level);
+      addPing(coords[1], coords[0], magLevel(parseFloat(mag)));
       addSeismicItem({
-        mag, level, src: 'USGS',
+        mag,
+        level: magLevel(parseFloat(mag)),
         place: f.properties.place ?? 'Unknown',
-        depth: Math.round(coords[2]),
-        time: new Date(f.properties.time).toUTCString().slice(17, 25),
+        time: new Date(f.properties.time).toISOString().slice(0, 16).replace('T', ' '),
       });
     });
     document.getElementById('seismic-src').textContent = 'USGS LIVE';
-    seismicSrc = 'USGS';
   } catch(e) {
     document.getElementById('seismic-src').textContent = 'SIMULATED';
   }
@@ -487,7 +476,6 @@ const TICKERS = [
   { cat: 'SPACE',    text: 'James Webb captures galaxy formation at record z > 14' },
   { cat: 'HEALTH',   text: 'Global antibiotic resistance database expanded to 194 nations' },
 ];
-
 const tickerTrack = document.getElementById('ticker-track');
 const doubled = [...TICKERS, ...TICKERS];
 tickerTrack.innerHTML = doubled.map(t =>
@@ -502,24 +490,22 @@ const R = 270, CX = 300, CY = 300;
 let rotY = 0, rotX = 0.25;
 let isDragging = false, lastMouseX = 0, lastMouseY = 0, velX = 0, velY = 0;
 
-// Ping system for seismic events
 const pings = [];
 function addPing(lat, lon, level) {
-  pings.push({ lat, lon, level, age: 0, maxAge: 80 });
+  pings.push({ lat, lon, level, age: 0, maxAge: 90 });
   if (pings.length > 20) pings.shift();
 }
 const PING_COLOR = { minor: '#00ff9d', moderate: '#ffd600', strong: '#ff3e6c', major: '#ff0040' };
 
-// Animated arc system for data flows
 const ARCS_DEF = [
-  { a: [40.7,-74.0], b: [51.5,-0.1]  },
-  { a: [51.5,-0.1],  b: [48.9, 2.4]  },
-  { a: [51.5,-0.1],  b: [35.7,139.7] },
-  { a: [35.7,139.7], b: [1.3,103.8]  },
-  { a: [1.3,103.8],  b: [25.2, 55.3] },
-  { a: [25.2,55.3],  b: [48.9, 2.4]  },
-  { a: [40.7,-74.0], b: [-23.5,-46.6]},
-  { a: [39.9,116.4], b: [35.7,139.7] },
+  { a: [40.7,-74.0], b: [51.5,-0.1]   },
+  { a: [51.5,-0.1],  b: [48.9, 2.4]   },
+  { a: [51.5,-0.1],  b: [35.7,139.7]  },
+  { a: [35.7,139.7], b: [1.3,103.8]   },
+  { a: [1.3,103.8],  b: [25.2, 55.3]  },
+  { a: [25.2,55.3],  b: [48.9, 2.4]   },
+  { a: [40.7,-74.0], b: [-23.5,-46.6] },
+  { a: [39.9,116.4], b: [35.7,139.7]  },
 ];
 let arcPhase = 0;
 
@@ -562,36 +548,38 @@ const CITY_COORDS = [
 function drawGlobe() {
   gc.clearRect(0, 0, globeCanvas.width, globeCanvas.height);
 
-  // Sphere
-  const bg = gc.createRadialGradient(CX-60,CY-60,20,CX,CY,R);
-  bg.addColorStop(0,'#0b2438'); bg.addColorStop(0.6,'#061520'); bg.addColorStop(1,'#020b12');
-  gc.beginPath(); gc.arc(CX,CY,R,0,Math.PI*2); gc.fillStyle = bg; gc.fill();
+  // Deep ocean sphere
+  const bg = gc.createRadialGradient(CX-70, CY-70, 20, CX, CY, R);
+  bg.addColorStop(0, '#0d3a5a');
+  bg.addColorStop(0.55, '#062035');
+  bg.addColorStop(1, '#020c1a');
+  gc.beginPath(); gc.arc(CX, CY, R, 0, Math.PI*2); gc.fillStyle = bg; gc.fill();
 
-  // Night shading (day/night terminator)
+  // Day/night terminator
   const sun = getSunPosition();
   const nightLat = -sun.lat, nightLon = sun.lon + 180;
   const nc = project(nightLat, nightLon);
   gc.save();
   gc.beginPath(); gc.arc(CX, CY, R, 0, Math.PI*2); gc.clip();
   if (nc.z > 0) {
-    const ng = gc.createRadialGradient(nc.x,nc.y,0,nc.x,nc.y,R*1.6);
-    ng.addColorStop(0,'rgba(0,3,12,0.72)'); ng.addColorStop(0.65,'rgba(0,3,12,0.38)'); ng.addColorStop(1,'rgba(0,3,12,0)');
-    gc.fillStyle = ng; gc.fillRect(0,0,globeCanvas.width,globeCanvas.height);
+    const ng = gc.createRadialGradient(nc.x, nc.y, 0, nc.x, nc.y, R*1.6);
+    ng.addColorStop(0, 'rgba(0,2,10,0.75)'); ng.addColorStop(0.65, 'rgba(0,2,10,0.4)'); ng.addColorStop(1, 'rgba(0,2,10,0)');
+    gc.fillStyle = ng; gc.fillRect(0, 0, globeCanvas.width, globeCanvas.height);
   } else {
-    const sg = gc.createRadialGradient(CX*2-nc.x,CY*2-nc.y,0,CX*2-nc.x,CY*2-nc.y,R*1.6);
-    sg.addColorStop(0,'rgba(0,3,12,0.72)'); sg.addColorStop(0.65,'rgba(0,3,12,0.38)'); sg.addColorStop(1,'rgba(0,3,12,0)');
-    gc.fillStyle = sg; gc.fillRect(0,0,globeCanvas.width,globeCanvas.height);
+    const sg = gc.createRadialGradient(CX*2-nc.x, CY*2-nc.y, 0, CX*2-nc.x, CY*2-nc.y, R*1.6);
+    sg.addColorStop(0, 'rgba(0,2,10,0.75)'); sg.addColorStop(0.65, 'rgba(0,2,10,0.4)'); sg.addColorStop(1, 'rgba(0,2,10,0)');
+    gc.fillStyle = sg; gc.fillRect(0, 0, globeCanvas.width, globeCanvas.height);
   }
   gc.restore();
 
-  // Grid
-  gc.strokeStyle = '#0e3a5c44'; gc.lineWidth = 0.5;
+  // Graticule
+  gc.strokeStyle = 'rgba(30,80,110,0.3)'; gc.lineWidth = 0.4;
   for (let lat = -80; lat <= 80; lat += 20) {
     gc.beginPath(); let first = true;
     for (let lon = -180; lon <= 180; lon += 3) {
       const p = project(lat, lon);
       if (p.z < 0) { first = true; continue; }
-      first ? gc.moveTo(p.x,p.y) : gc.lineTo(p.x,p.y); first = false;
+      first ? gc.moveTo(p.x, p.y) : gc.lineTo(p.x, p.y); first = false;
     } gc.stroke();
   }
   for (let lon = -180; lon < 180; lon += 20) {
@@ -599,89 +587,90 @@ function drawGlobe() {
     for (let lat = -90; lat <= 90; lat += 3) {
       const p = project(lat, lon);
       if (p.z < 0) { first = true; continue; }
-      first ? gc.moveTo(p.x,p.y) : gc.lineTo(p.x,p.y); first = false;
+      first ? gc.moveTo(p.x, p.y) : gc.lineTo(p.x, p.y); first = false;
     } gc.stroke();
   }
 
-  // Land
-  gc.fillStyle = '#00d4ff1e'; gc.strokeStyle = '#00d4ffaa'; gc.lineWidth = 0.8;
+  // Land — realistic green
+  gc.fillStyle = '#1e4d22';
+  gc.strokeStyle = '#2e7a38';
+  gc.lineWidth = 0.7;
   LAND.forEach(poly => {
-    const pts = poly.map(([la,lo]) => project(la,lo));
+    const pts = poly.map(([la, lo]) => project(la, lo));
     if (pts.filter(p => p.z > 0).length < 3) return;
     gc.beginPath(); let s = false;
-    pts.forEach(p => { if (p.z < 0) { s=false; return; } s ? gc.lineTo(p.x,p.y) : gc.moveTo(p.x,p.y); s=true; });
+    pts.forEach(p => { if (p.z < 0) { s = false; return; } s ? gc.lineTo(p.x, p.y) : gc.moveTo(p.x, p.y); s = true; });
     gc.closePath(); gc.fill(); gc.stroke();
   });
 
-  // Data arcs
+  // Data arcs — warm gold
   arcPhase = (arcPhase + 0.008) % 1;
   gc.lineWidth = 1.2;
   ARCS_DEF.forEach((arc, i) => {
-    const phase = (arcPhase + i/ARCS_DEF.length) % 1;
-    const tail = 0.25;
-    const head = phase, start = Math.max(0, phase - tail);
-    gc.beginPath();
-    let started = false;
+    const phase = (arcPhase + i / ARCS_DEF.length) % 1;
+    const head = phase, start = Math.max(0, phase - 0.25);
+    gc.beginPath(); let started = false;
     for (let t = start; t <= head; t += 0.025) {
-      const m = slerp(arc.a[0],arc.a[1],arc.b[0],arc.b[1],t);
+      const m = slerp(arc.a[0], arc.a[1], arc.b[0], arc.b[1], t);
       const p = project(m.lat, m.lon);
       if (p.z < 0.05) { started = false; continue; }
-      started ? gc.lineTo(p.x,p.y) : gc.moveTo(p.x,p.y); started = true;
+      started ? gc.lineTo(p.x, p.y) : gc.moveTo(p.x, p.y); started = true;
     }
-    const alpha = 0.3 + 0.2 * Math.sin(arcPhase * Math.PI * 6 + i);
-    gc.strokeStyle = `rgba(0,212,255,${alpha})`; gc.stroke();
+    const alpha = 0.35 + 0.2 * Math.sin(arcPhase * Math.PI * 6 + i);
+    gc.strokeStyle = `rgba(255,185,40,${alpha})`; gc.stroke();
   });
 
-  // City dots
-  CITY_COORDS.forEach(([lat,lon,label]) => {
+  // City dots — gold
+  CITY_COORDS.forEach(([lat, lon, label]) => {
     const p = project(lat, lon);
     if (p.z < 0.05) return;
-    gc.beginPath(); gc.arc(p.x,p.y,2.5,0,Math.PI*2);
-    gc.fillStyle = '#00ff9d'; gc.shadowColor = '#00ff9d'; gc.shadowBlur = 7;
+    gc.beginPath(); gc.arc(p.x, p.y, 2.5, 0, Math.PI*2);
+    gc.fillStyle = '#ffc300'; gc.shadowColor = '#ffc300'; gc.shadowBlur = 8;
     gc.fill(); gc.shadowBlur = 0;
-    gc.fillStyle = '#00ff9dbb'; gc.font = '8px Courier New';
-    gc.fillText(label, p.x+4, p.y-3);
+    gc.fillStyle = 'rgba(255,195,50,0.8)'; gc.font = '8px Courier New';
+    gc.fillText(label, p.x + 4, p.y - 3);
   });
 
   // Seismic pings
   for (let i = pings.length - 1; i >= 0; i--) {
-    const ping = pings[i];
-    ping.age++;
-    if (ping.age >= ping.maxAge) { pings.splice(i,1); continue; }
+    const ping = pings[i]; ping.age++;
+    if (ping.age >= ping.maxAge) { pings.splice(i, 1); continue; }
     const p = project(ping.lat, ping.lon);
     if (p.z < 0.05) continue;
     const t = ping.age / ping.maxAge;
-    const color = PING_COLOR[ping.level] ?? '#00d4ff';
-    gc.beginPath(); gc.arc(p.x, p.y, t * 22, 0, Math.PI*2);
-    gc.strokeStyle = color; gc.globalAlpha = (1-t) * 0.8;
-    gc.lineWidth = 1.5 - t; gc.stroke();
-    gc.globalAlpha = 1;
+    const color = PING_COLOR[ping.level] ?? '#ffd600';
+    gc.beginPath(); gc.arc(p.x, p.y, t * 24, 0, Math.PI*2);
+    gc.strokeStyle = color; gc.globalAlpha = (1 - t) * 0.85;
+    gc.lineWidth = 1.5 - t; gc.stroke(); gc.globalAlpha = 1;
     if (t < 0.15) {
-      gc.beginPath(); gc.arc(p.x,p.y,3,0,Math.PI*2);
-      gc.fillStyle = color; gc.shadowColor = color; gc.shadowBlur = 8;
+      gc.beginPath(); gc.arc(p.x, p.y, 3, 0, Math.PI*2);
+      gc.fillStyle = color; gc.shadowColor = color; gc.shadowBlur = 10;
       gc.fill(); gc.shadowBlur = 0;
     }
   }
 
   // Atmosphere
-  const atm = gc.createRadialGradient(CX,CY,R-8,CX,CY,R+10);
-  atm.addColorStop(0,'transparent'); atm.addColorStop(0.5,'#00d4ff14'); atm.addColorStop(1,'transparent');
-  gc.beginPath(); gc.arc(CX,CY,R+5,0,Math.PI*2); gc.fillStyle = atm; gc.fill();
+  const atm = gc.createRadialGradient(CX, CY, R - 6, CX, CY, R + 14);
+  atm.addColorStop(0, 'transparent');
+  atm.addColorStop(0.4, 'rgba(30,90,180,0.15)');
+  atm.addColorStop(1, 'transparent');
+  gc.beginPath(); gc.arc(CX, CY, R + 10, 0, Math.PI*2); gc.fillStyle = atm; gc.fill();
 
   // Specular
-  const spec = gc.createRadialGradient(CX-70,CY-70,5,CX-50,CY-50,R*0.7);
-  spec.addColorStop(0,'#ffffff15'); spec.addColorStop(1,'transparent');
-  gc.beginPath(); gc.arc(CX,CY,R,0,Math.PI*2); gc.fillStyle = spec; gc.fill();
+  const spec = gc.createRadialGradient(CX-80, CY-80, 5, CX-50, CY-50, R*0.7);
+  spec.addColorStop(0, 'rgba(255,255,255,0.12)'); spec.addColorStop(1, 'transparent');
+  gc.beginPath(); gc.arc(CX, CY, R, 0, Math.PI*2); gc.fillStyle = spec; gc.fill();
 
-  // Sun position indicator
+  // Sun indicator
   const sunP = project(sun.lat, sun.lon);
   if (sunP.z > 0) {
-    gc.beginPath(); gc.arc(sunP.x,sunP.y,4,0,Math.PI*2);
-    gc.fillStyle = '#fff176'; gc.shadowColor = '#fff176'; gc.shadowBlur = 12;
+    gc.beginPath(); gc.arc(sunP.x, sunP.y, 5, 0, Math.PI*2);
+    gc.fillStyle = '#fff7aa'; gc.shadowColor = '#ffe070'; gc.shadowBlur = 14;
     gc.fill(); gc.shadowBlur = 0;
   }
-  const sunPosEl = document.getElementById('sun-pos');
-  if (sunPosEl) sunPosEl.textContent = `SUN ${sun.lat.toFixed(1)}°N ${sun.lon.toFixed(0)}°E`;
+
+  const sunEl = document.getElementById('sun-pos');
+  if (sunEl) sunEl.textContent = `SUN ${sun.lat.toFixed(1)}°N ${sun.lon.toFixed(0)}°E`;
   const hudRot = document.getElementById('hud-rot');
   if (hudRot) hudRot.textContent = `LON ${(((rotY * 180 / Math.PI) % 360 + 360) % 360).toFixed(1)}°`;
 }
@@ -697,7 +686,7 @@ function animateGlobe() {
 }
 animateGlobe();
 
-globeCanvas.addEventListener('mousedown', e => { isDragging=true; lastMouseX=e.clientX; lastMouseY=e.clientY; velX=velY=0; });
+globeCanvas.addEventListener('mousedown', e => { isDragging = true; lastMouseX = e.clientX; lastMouseY = e.clientY; velX = velY = 0; });
 window.addEventListener('mousemove', e => {
   if (!isDragging) return;
   velX = (e.clientX - lastMouseX) * 0.005; velY = (e.clientY - lastMouseY) * 0.005;
@@ -705,10 +694,10 @@ window.addEventListener('mousemove', e => {
   lastMouseX = e.clientX; lastMouseY = e.clientY;
 });
 window.addEventListener('mouseup', () => { isDragging = false; });
-globeCanvas.addEventListener('touchstart', e => { isDragging=true; lastMouseX=e.touches[0].clientX; lastMouseY=e.touches[0].clientY; }, { passive: true });
+globeCanvas.addEventListener('touchstart', e => { isDragging = true; lastMouseX = e.touches[0].clientX; lastMouseY = e.touches[0].clientY; }, { passive: true });
 globeCanvas.addEventListener('touchmove', e => {
   if (!isDragging) return;
-  velX = (e.touches[0].clientX-lastMouseX)*0.005; velY = (e.touches[0].clientY-lastMouseY)*0.005;
+  velX = (e.touches[0].clientX - lastMouseX) * 0.005; velY = (e.touches[0].clientY - lastMouseY) * 0.005;
   rotY += velX; rotX = Math.max(-Math.PI/2, Math.min(Math.PI/2, rotX + velY));
   lastMouseX = e.touches[0].clientX; lastMouseY = e.touches[0].clientY;
 }, { passive: true });

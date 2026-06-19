@@ -32,76 +32,60 @@
 
   <main class="scene">
 
-    <!-- Left Panel -->
+    <!-- Left Panel: Clocks + Global Pulse -->
     <aside class="panel panel--left">
-
-      <div class="panel-block">
-        <div class="block-label">SYSTEM STATUS</div>
-        <div class="stat-cards">
-          <div class="stat-card blue">
-            <div class="sc-label">FLIGHTS</div>
-            <div class="sc-val" id="sc-flights">—</div>
-          </div>
-          <div class="stat-card green">
-            <div class="sc-label">SATELLITES</div>
-            <div class="sc-val" id="sc-satellites">—</div>
-          </div>
-          <div class="stat-card yellow">
-            <div class="sc-label">QUAKES</div>
-            <div class="sc-val" id="sc-quakes">—</div>
-          </div>
-          <div class="stat-card red">
-            <div class="sc-label">ALERTS</div>
-            <div class="sc-val" id="sc-alerts">—</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel-block">
-        <div class="block-label">GLOBAL PULSE</div>
-        <div id="stats-list"></div>
-      </div>
-
       <div class="panel-block">
         <div class="block-label">WORLD CLOCKS</div>
         <div id="clocks-grid"></div>
       </div>
-
+      <div class="panel-block">
+        <div class="block-label">GLOBAL PULSE</div>
+        <div id="stats-grid" class="stats-icon-grid"></div>
+      </div>
     </aside>
 
-    <!-- Globe Center -->
-    <div class="globe-center">
-      <div class="orb-rings">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
+    <!-- Center column: Globe + Data Row -->
+    <div class="scene-center">
+      <div class="globe-center">
+        <div class="orb-rings">
+          <div class="orb orb-1"></div>
+          <div class="orb orb-2"></div>
+          <div class="orb orb-3"></div>
+        </div>
+        <canvas id="globe" width="600" height="600"></canvas>
+        <div class="globe-hud">
+          <span id="hud-rot" class="hud-item"></span>
+          <span id="sun-pos" class="hud-item"></span>
+        </div>
       </div>
-      <canvas id="globe" width="600" height="600"></canvas>
-      <div class="globe-hud">
-        <span id="hud-rot" class="hud-item"></span>
-        <span id="sun-pos" class="hud-item"></span>
+
+      <div class="data-row">
+        <div class="data-block data-block--activity">
+          <div class="block-label">INTERNET ACTIVITY — 60s</div>
+          <canvas id="activity-chart"></canvas>
+          <div id="activity-legend" class="act-legend"></div>
+        </div>
+        <div class="data-block data-block--seismic">
+          <div class="block-label">SEISMIC MONITOR <span class="block-note" id="seismic-src"></span></div>
+          <div class="seismic-table-hdr">
+            <span class="sth-loc">LOCATION</span>
+            <span class="sth-mag">MAG</span>
+            <span class="sth-time">TIME (UTC)</span>
+          </div>
+          <div id="seismic-feed"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Right Panel -->
+    <!-- Right Panel: Markets -->
     <aside class="panel panel--right">
-
-      <div class="panel-block">
-        <div class="block-label">INTERNET ACTIVITY — 60s</div>
-        <canvas id="activity-chart" width="228" height="100"></canvas>
-        <div id="activity-legend" class="act-legend"></div>
-      </div>
-
       <div class="panel-block">
         <div class="block-label">MARKETS <span class="block-note">SIMULATED</span></div>
+        <div class="mkt-col-hdr">
+          <span></span><span>24H</span><span>7D</span>
+        </div>
         <div id="markets-list"></div>
       </div>
-
-      <div class="panel-block">
-        <div class="block-label">SEISMIC <span class="block-note" id="seismic-src"></span></div>
-        <div id="seismic-feed"></div>
-      </div>
-
     </aside>
 
   </main>
@@ -112,6 +96,13 @@
       <div class="ticker-track" id="ticker-track"></div>
     </div>
   </div>
+
+  <nav class="mobile-nav">
+    <button class="mnav-btn active"><span class="mnav-icon">⌂</span><span class="mnav-label">HOME</span></button>
+    <button class="mnav-btn"><span class="mnav-icon">◉</span><span class="mnav-label">GLOBE</span></button>
+    <button class="mnav-btn"><span class="mnav-icon">⚠</span><span class="mnav-label">ALERTS</span></button>
+    <button class="mnav-btn"><span class="mnav-icon">◎</span><span class="mnav-label">PROFILE</span></button>
+  </nav>
 
   <script src="app.js"></script>
 </body>
