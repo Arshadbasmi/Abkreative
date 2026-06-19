@@ -1,5 +1,41 @@
 'use strict';
 
+// ── Star Field ────────────────────────────────────────────────
+const starsCv = document.getElementById('stars-bg');
+starsCv.width = window.innerWidth;
+starsCv.height = window.innerHeight;
+const sctx = starsCv.getContext('2d');
+const STARS = Array.from({ length: 220 }, () => ({
+  x: Math.random(), y: Math.random(),
+  r: Math.random() * 1.1 + 0.25,
+  base: Math.random() * 0.55 + 0.15,
+  phase: Math.random() * Math.PI * 2,
+}));
+function drawStars(ts) {
+  sctx.clearRect(0, 0, starsCv.width, starsCv.height);
+  STARS.forEach(s => {
+    const a = s.base + 0.18 * Math.sin(ts * 0.0007 + s.phase);
+    sctx.beginPath();
+    sctx.arc(s.x * starsCv.width, s.y * starsCv.height, s.r, 0, Math.PI * 2);
+    sctx.fillStyle = `rgba(180,220,255,${a.toFixed(2)})`;
+    sctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+requestAnimationFrame(drawStars);
+window.addEventListener('resize', () => {
+  starsCv.width = window.innerWidth;
+  starsCv.height = window.innerHeight;
+});
+
+// ── Nav Tabs ──────────────────────────────────────────────────
+document.querySelectorAll('.nav-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
 // ── UTC Clock ──────────────────────────────────────────────────
 const utcEl = document.getElementById('utc-clock');
 function tickUTC() {
@@ -20,9 +56,19 @@ const STATUS = {
 let quakesToday = 0;
 function updateStatus() {
   Object.values(STATUS).forEach(s => {
-    s.el.textContent = Math.round(s.base + (Math.random() - 0.5) * s.noise).toLocaleString();
+    const val = Math.round(s.base + (Math.random() - 0.5) * s.noise).toLocaleString();
+    s.el.textContent = val;
   });
   document.getElementById('s-quakes').textContent = quakesToday;
+  // Update left-panel status cards
+  const scF = document.getElementById('sc-flights');
+  const scS = document.getElementById('sc-satellites');
+  const scQ = document.getElementById('sc-quakes');
+  const scA = document.getElementById('sc-alerts');
+  if (scF) scF.textContent = STATUS.flights.el.textContent;
+  if (scS) scS.textContent = STATUS.satellites.el.textContent;
+  if (scQ) scQ.textContent = quakesToday;
+  if (scA) scA.textContent = STATUS.alerts.el.textContent;
 }
 setInterval(updateStatus, 5000);
 updateStatus();
@@ -55,16 +101,13 @@ const WX_CODE = {
 const clocksGrid = document.getElementById('clocks-grid');
 CITIES.forEach(city => {
   const key = city.name.replace(/ /g, '_');
+  const abbr = city.name.split(' ')[0].slice(0, 7);
   const el = document.createElement('div');
-  el.className = 'clock-item';
+  el.className = 'clock-row';
   el.innerHTML = `
-    <div class="clock-city">${city.name}</div>
-    <div class="clock-time" id="ct-${key}">00:00:00</div>
-    <div class="clock-date" id="cd-${key}"></div>
-    <div class="clock-meta">
-      <span class="clock-offset">UTC${city.offset >= 0 ? '+' : ''}${city.offset}</span>
-      <span class="clock-weather" id="cw-${key}"></span>
-    </div>
+    <span class="clock-city">${abbr}</span>
+    <span class="clock-time" id="ct-${key}">--:--</span>
+    <span class="clock-wx" id="cw-${key}"></span>
   `;
   clocksGrid.appendChild(el);
 });
@@ -74,10 +117,9 @@ function updateClocks() {
   CITIES.forEach(city => {
     try {
       const key = city.name.replace(/ /g, '_');
-      document.getElementById(`ct-${key}`).textContent =
+      const el = document.getElementById(`ct-${key}`);
+      if (el) el.textContent =
         now.toLocaleTimeString('en-GB', { timeZone: city.tz, hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      document.getElementById(`cd-${key}`).textContent =
-        now.toLocaleDateString('en-US', { timeZone: city.tz, weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase();
     } catch(e) {}
   });
 }
@@ -187,7 +229,7 @@ MARKETS.forEach(m => {
       <span class="market-change" id="mc-${m.id}">+0.00%</span>
     </div>
     <div class="market-price" id="mp-${m.id}"></div>
-    <svg class="market-sparkline" id="ms-${m.id}" viewBox="0 0 100 28" preserveAspectRatio="none"></svg>
+    <svg class="market-sparkline" id="ms-${m.id}" viewBox="0 0 100 22" preserveAspectRatio="none"></svg>
   `;
   mktList.appendChild(div);
 });
@@ -195,26 +237,26 @@ MARKETS.forEach(m => {
 function renderSparkline(id, history, color) {
   const svg = document.getElementById(`ms-${id}`);
   if (!svg) return;
+  const H = 22;
   const min = Math.min(...history), max = Math.max(...history);
   const range = max - min || 1;
   const pts = history.map((v, i) => {
     const x = (i / (history.length - 1)) * 100;
-    const y = 28 - ((v - min) / range) * 24 - 2;
+    const y = H - ((v - min) / range) * (H - 2) - 1;
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   }).join(' ');
+  const lastY = (H - ((history[history.length - 1] - min) / range) * (H - 2) - 1).toFixed(1);
 
   svg.innerHTML = `
     <defs>
       <linearGradient id="sg-${id}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="${color}" stop-opacity="0.3"/>
+        <stop offset="0%" stop-color="${color}" stop-opacity="0.28"/>
         <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
       </linearGradient>
     </defs>
-    <polygon points="0,28 ${pts} 100,28" fill="url(#sg-${id})"/>
+    <polygon points="0,${H} ${pts} 100,${H}" fill="url(#sg-${id})"/>
     <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5"/>
-    <circle cx="${history.length > 0 ? (100).toFixed(1) : 100}"
-            cy="${(28 - ((history[history.length-1] - min) / range) * 24 - 2).toFixed(1)}"
-            r="2" fill="${color}"/>
+    <circle cx="100" cy="${lastY}" r="2" fill="${color}"/>
   `;
 }
 
@@ -270,7 +312,7 @@ function pushChart() {
 
 function drawChart() {
   const W = chartCanvas.offsetWidth * devicePixelRatio;
-  const H = 130 * devicePixelRatio;
+  const H = 100 * devicePixelRatio;
   chartCanvas.width = W; chartCanvas.height = H;
   ctx.clearRect(0, 0, W, H);
 
@@ -456,7 +498,7 @@ tickerTrack.innerHTML = doubled.map(t =>
 // ── Globe ──────────────────────────────────────────────────────
 const globeCanvas = document.getElementById('globe');
 const gc = globeCanvas.getContext('2d');
-const R = 220, CX = 240, CY = 240;
+const R = 270, CX = 300, CY = 300;
 let rotY = 0, rotX = 0.25;
 let isDragging = false, lastMouseX = 0, lastMouseY = 0, velX = 0, velY = 0;
 
@@ -640,6 +682,8 @@ function drawGlobe() {
   }
   const sunPosEl = document.getElementById('sun-pos');
   if (sunPosEl) sunPosEl.textContent = `SUN ${sun.lat.toFixed(1)}°N ${sun.lon.toFixed(0)}°E`;
+  const hudRot = document.getElementById('hud-rot');
+  if (hudRot) hudRot.textContent = `LON ${(((rotY * 180 / Math.PI) % 360 + 360) % 360).toFixed(1)}°`;
 }
 
 function animateGlobe() {

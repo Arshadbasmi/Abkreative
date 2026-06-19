@@ -7,76 +7,111 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <canvas id="stars-bg"></canvas>
+
   <header class="header">
     <div class="header-left">
       <span class="logo">ABK<span class="accent">REATIVE</span></span>
       <span class="header-divider">|</span>
       <span class="header-title">WORLD MONITOR</span>
     </div>
-    <div class="header-center" id="status-bar">
-      <span class="status-item"><span class="status-dot"></span><span id="s-flights">8,241</span> FLIGHTS</span>
-      <span class="status-item"><span class="status-dot status-dot--green"></span><span id="s-satellites">8,377</span> SATELLITES</span>
-      <span class="status-item"><span class="status-dot status-dot--yellow"></span><span id="s-quakes">0</span> QUAKES TODAY</span>
-      <span class="status-item"><span class="status-dot status-dot--red"></span><span id="s-alerts">3</span> ALERTS</span>
-    </div>
+    <nav class="header-nav">
+      <button class="nav-tab active">DATA OVERVIEW</button>
+      <button class="nav-tab">RISK MONITOR</button>
+      <button class="nav-tab">LIVE FEED</button>
+    </nav>
     <div class="header-right">
+      <span class="status-item"><span class="status-dot"></span><span id="s-flights">8,241</span></span>
+      <span class="status-item"><span class="status-dot status-dot--green"></span><span id="s-satellites">8,377</span></span>
+      <span class="status-item"><span class="status-dot status-dot--yellow"></span><span id="s-quakes">0</span></span>
+      <span class="status-item"><span class="status-dot status-dot--red"></span><span id="s-alerts">3</span></span>
       <span class="live-badge"><span class="pulse-dot"></span>LIVE</span>
       <span id="utc-clock" class="utc-clock">UTC 00:00:00</span>
     </div>
   </header>
 
-  <main class="grid">
+  <main class="scene">
 
-    <!-- Globe -->
-    <section class="card card--globe">
-      <div class="card-label">EARTH — REAL TIME <span class="label-note" id="sun-pos"></span></div>
-      <canvas id="globe" width="480" height="480"></canvas>
-      <div class="globe-overlay">
-        <div class="geo-line"></div>
-        <div class="geo-line geo-line--2"></div>
+    <!-- Left Panel -->
+    <aside class="panel panel--left">
+
+      <div class="panel-block">
+        <div class="block-label">SYSTEM STATUS</div>
+        <div class="stat-cards">
+          <div class="stat-card blue">
+            <div class="sc-label">FLIGHTS</div>
+            <div class="sc-val" id="sc-flights">—</div>
+          </div>
+          <div class="stat-card green">
+            <div class="sc-label">SATELLITES</div>
+            <div class="sc-val" id="sc-satellites">—</div>
+          </div>
+          <div class="stat-card yellow">
+            <div class="sc-label">QUAKES</div>
+            <div class="sc-val" id="sc-quakes">—</div>
+          </div>
+          <div class="stat-card red">
+            <div class="sc-label">ALERTS</div>
+            <div class="sc-val" id="sc-alerts">—</div>
+          </div>
+        </div>
       </div>
-    </section>
 
-    <!-- World Clocks -->
-    <section class="card card--clocks">
-      <div class="card-label">WORLD CLOCKS</div>
-      <div class="clocks-grid" id="clocks-grid"></div>
-    </section>
-
-    <!-- Global Stats -->
-    <section class="card card--stats">
-      <div class="card-label">GLOBAL PULSE</div>
-      <div class="stats-list" id="stats-list"></div>
-    </section>
-
-    <!-- Markets -->
-    <section class="card card--markets">
-      <div class="card-label">MARKETS <span class="label-note">SIMULATED</span></div>
-      <div class="markets-list" id="markets-list"></div>
-    </section>
-
-    <!-- Internet Activity -->
-    <section class="card card--internet">
-      <div class="card-label">INTERNET ACTIVITY — LAST 60s</div>
-      <canvas id="activity-chart" width="600" height="140"></canvas>
-      <div class="activity-legend" id="activity-legend"></div>
-    </section>
-
-    <!-- Seismic Events -->
-    <section class="card card--seismic">
-      <div class="card-label">SEISMIC MONITOR <span class="label-note" id="seismic-src"></span></div>
-      <div class="seismic-feed" id="seismic-feed"></div>
-    </section>
-
-    <!-- News Ticker -->
-    <section class="card card--ticker">
-      <div class="ticker-inner">
-        <span class="ticker-tag">FEEDS</span>
-        <div class="ticker-track" id="ticker-track"></div>
+      <div class="panel-block">
+        <div class="block-label">GLOBAL PULSE</div>
+        <div id="stats-list"></div>
       </div>
-    </section>
+
+      <div class="panel-block">
+        <div class="block-label">WORLD CLOCKS</div>
+        <div id="clocks-grid"></div>
+      </div>
+
+    </aside>
+
+    <!-- Globe Center -->
+    <div class="globe-center">
+      <div class="orb-rings">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+      </div>
+      <canvas id="globe" width="600" height="600"></canvas>
+      <div class="globe-hud">
+        <span id="hud-rot" class="hud-item"></span>
+        <span id="sun-pos" class="hud-item"></span>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <aside class="panel panel--right">
+
+      <div class="panel-block">
+        <div class="block-label">INTERNET ACTIVITY — 60s</div>
+        <canvas id="activity-chart" width="228" height="100"></canvas>
+        <div id="activity-legend" class="act-legend"></div>
+      </div>
+
+      <div class="panel-block">
+        <div class="block-label">MARKETS <span class="block-note">SIMULATED</span></div>
+        <div id="markets-list"></div>
+      </div>
+
+      <div class="panel-block">
+        <div class="block-label">SEISMIC <span class="block-note" id="seismic-src"></span></div>
+        <div id="seismic-feed"></div>
+      </div>
+
+    </aside>
 
   </main>
+
+  <div class="ticker-bar">
+    <span class="ticker-tag">FEEDS</span>
+    <div class="ticker-scroll">
+      <div class="ticker-track" id="ticker-track"></div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
