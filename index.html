@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Monitor — Live</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="stars-bg"></canvas>
+
+  <header class="header">
+    <div class="header-left">
+      <span class="logo">ABK<span class="accent">REATIVE</span></span>
+      <span class="header-divider">|</span>
+      <span class="header-title">WORLD MONITOR</span>
+    </div>
+    <nav class="header-nav">
+      <button class="nav-tab active">DATA OVERVIEW</button>
+      <button class="nav-tab">RISK MONITOR</button>
+      <button class="nav-tab">LIVE FEED</button>
+    </nav>
+    <div class="header-right">
+      <span class="status-item"><span class="status-dot"></span><span id="s-flights">8,241</span></span>
+      <span class="status-item"><span class="status-dot status-dot--green"></span><span id="s-satellites">8,377</span></span>
+      <span class="status-item"><span class="status-dot status-dot--yellow"></span><span id="s-quakes">0</span></span>
+      <span class="status-item"><span class="status-dot status-dot--red"></span><span id="s-alerts">3</span></span>
+      <span class="live-badge"><span class="pulse-dot"></span>LIVE</span>
+      <span id="utc-clock" class="utc-clock">UTC 00:00:00</span>
+    </div>
+  </header>
+
+  <main class="scene">
+
+    <!-- Left Panel: Clocks + Global Pulse -->
+    <aside class="panel panel--left">
+      <div class="panel-block">
+        <div class="block-label">WORLD CLOCKS</div>
+        <div id="clocks-grid"></div>
+      </div>
+      <div class="panel-block">
+        <div class="block-label">GLOBAL PULSE</div>
+        <div id="stats-grid" class="stats-icon-grid"></div>
+      </div>
+    </aside>
+
+    <!-- Center column: Globe + Data Row -->
+    <div class="scene-center">
+      <div class="globe-center">
+        <div class="orb-rings">
+          <div class="orb orb-1"></div>
+          <div class="orb orb-2"></div>
+          <div class="orb orb-3"></div>
+        </div>
+        <canvas id="globe" width="600" height="600"></canvas>
+        <div class="globe-hud">
+          <span id="hud-rot" class="hud-item"></span>
+          <span id="sun-pos" class="hud-item"></span>
+        </div>
+      </div>
+
+      <div class="data-row">
+        <div class="data-block data-block--activity">
+          <div class="block-label">INTERNET ACTIVITY — 60s</div>
+          <canvas id="activity-chart"></canvas>
+          <div id="activity-legend" class="act-legend"></div>
+        </div>
+        <div class="data-block data-block--seismic">
+          <div class="block-label">SEISMIC MONITOR <span class="block-note" id="seismic-src"></span></div>
+          <div class="seismic-table-hdr">
+            <span class="sth-loc">LOCATION</span>
+            <span class="sth-mag">MAG</span>
+            <span class="sth-time">TIME (UTC)</span>
+          </div>
+          <div id="seismic-feed"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Markets -->
+    <aside class="panel panel--right">
+      <div class="panel-block">
+        <div class="block-label">MARKETS <span class="block-note">SIMULATED</span></div>
+        <div class="mkt-col-hdr">
+          <span></span><span>24H</span><span>7D</span>
+        </div>
+        <div id="markets-list"></div>
+      </div>
+    </aside>
+
+  </main>
+
+  <div class="ticker-bar">
+    <span class="ticker-tag">FEEDS</span>
+    <div class="ticker-scroll">
+      <div class="ticker-track" id="ticker-track"></div>
+    </div>
+  </div>
+
+  <nav class="mobile-nav">
+    <button class="mnav-btn active"><span class="mnav-icon">⌂</span><span class="mnav-label">HOME</span></button>
+    <button class="mnav-btn"><span class="mnav-icon">◉</span><span class="mnav-label">GLOBE</span></button>
+    <button class="mnav-btn"><span class="mnav-icon">⚠</span><span class="mnav-label">ALERTS</span></button>
+    <button class="mnav-btn"><span class="mnav-icon">◎</span><span class="mnav-label">PROFILE</span></button>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html>
