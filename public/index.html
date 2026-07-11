@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#6d28d9">
+<title>Bingo 1-99 — Play with Friends</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ===================== HOME ===================== -->
+  <section class="screen" id="screen-home">
+    <div class="panel center-panel">
+      <h1 class="logo">🎱 Bingo <span>1–99</span></h1>
+      <p class="tagline">Play with everyone on your Wi-Fi</p>
+
+      <div class="home-actions">
+        <button class="btn btn-primary btn-lg" id="btn-host">🖥️ Host a Game</button>
+        <button class="btn btn-lg" id="btn-show-join">📱 Join a Game</button>
+      </div>
+
+      <form class="join-form hidden" id="join-form">
+        <label>Your name
+          <input type="text" id="join-name" maxlength="24" placeholder="e.g. Sam" required>
+        </label>
+        <label>Room code
+          <input type="text" id="join-code" maxlength="4" placeholder="ABCD" autocapitalize="characters" required>
+        </label>
+        <p class="error-text hidden" id="join-error"></p>
+        <button type="submit" class="btn btn-primary btn-lg">Join</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===================== HOST LOBBY ===================== -->
+  <section class="screen hidden" id="screen-host-lobby">
+    <div class="panel">
+      <p class="eyebrow">Share this code with your friends</p>
+      <div class="room-code" id="host-room-code">····</div>
+      <p class="hint" id="host-share-hint"></p>
+
+      <label class="host-play-toggle">
+        <input type="checkbox" id="host-play-along"> I want to play too
+      </label>
+
+      <h3 class="section-title">Players joined <span id="host-player-count">(0)</span></h3>
+      <ul class="player-list" id="host-player-list"><li class="empty-row">Waiting for players…</li></ul>
+
+      <button class="btn btn-primary btn-lg" id="btn-host-start" disabled>Start Game</button>
+    </div>
+  </section>
+
+  <!-- ===================== PLAYER WAITING ===================== -->
+  <section class="screen hidden" id="screen-player-waiting">
+    <div class="panel center-panel">
+      <div class="spinner"></div>
+      <h2>You're in the room!</h2>
+      <p class="hint">Waiting for the host to start the game…</p>
+      <h3 class="section-title">Players joined <span id="wait-player-count">(0)</span></h3>
+      <ul class="player-list" id="wait-player-list"></ul>
+    </div>
+  </section>
+
+  <!-- ===================== GAME (host + player share layout) ===================== -->
+  <section class="screen hidden" id="screen-game">
+    <header class="game-header">
+      <div class="current-call">
+        <span class="current-call-label">Current number</span>
+        <div class="current-call-number" id="current-number">–</div>
+      </div>
+      <div class="game-header-side">
+        <div class="room-code-mini" id="game-room-code"></div>
+        <button class="btn btn-danger hidden" id="btn-claim-bingo">BINGO!</button>
+      </div>
+    </header>
+
+    <div class="game-body">
+      <div class="board-panel">
+        <h3 class="section-title">Called numbers <span id="called-count">(0/99)</span></h3>
+        <div class="number-board" id="number-board"></div>
+      </div>
+
+      <div class="side-panel" id="host-controls">
+        <h3 class="section-title">Host controls</h3>
+        <button class="btn btn-primary btn-lg" id="btn-call-number">🎲 Call Next Number</button>
+        <label class="autocall-toggle">
+          <input type="checkbox" id="autocall-checkbox"> Auto-call every
+          <select id="autocall-interval">
+            <option value="4000">4s</option>
+            <option value="6000" selected>6s</option>
+            <option value="10000">10s</option>
+            <option value="15000">15s</option>
+          </select>
+        </label>
+        <h3 class="section-title">Players <span id="game-player-count"></span></h3>
+        <ul class="player-list" id="game-player-list"></ul>
+        <button class="btn" id="btn-new-game">🔁 New Game</button>
+      </div>
+
+      <div class="side-panel hidden" id="player-card-panel">
+        <h3 class="section-title">Your card</h3>
+        <div class="bingo-card" id="player-card"></div>
+        <p class="hint">Numbers are marked automatically when called. Click BINGO! as soon as a row, column or diagonal is complete.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TOASTS / OVERLAYS ===================== -->
+  <div class="toast hidden" id="toast"></div>
+
+  <div class="overlay hidden" id="overlay-win">
+    <div class="overlay-card">
+      <div class="overlay-emoji">🏆</div>
+      <h2 id="win-title">We have a winner!</h2>
+      <p id="win-subtitle"></p>
+      <button class="btn btn-primary btn-lg" id="btn-win-close">Nice!</button>
+    </div>
+  </div>
+
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="client.js"></script>
+</body>
+</html>
